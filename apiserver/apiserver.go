@@ -20,7 +20,7 @@ type APIServer struct {
 	logger     *logrus.Logger
 	mux        *http.ServeMux
 	converter  IConverter
-	// Running    <-chan struct{}
+	Running    chan struct{}
 }
 
 // New ...
@@ -30,6 +30,7 @@ func New(l *logrus.Logger, c *Config, conv IConverter) *APIServer {
 		logger:    l,
 		converter: conv,
 		mux:       http.NewServeMux(),
+		Running:   make(chan struct{}),
 	}
 }
 
@@ -46,7 +47,7 @@ func (s *APIServer) ConfigureAPIServer() error {
 		WriteTimeout: 10 * time.Second,
 	}
 
-	s.Routes()
+	s.routes()
 
 	return nil
 }
@@ -59,6 +60,7 @@ func (s *APIServer) Run() error {
 	}
 
 	s.logger.Infof("Starting API server on %s", s.config.Addr)
+	close(s.Running)
 	if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		return err
 	}
@@ -66,6 +68,6 @@ func (s *APIServer) Run() error {
 }
 
 // Stop ...
-func (s *APIServer) Stop() {
-	s.httpServer.Shutdown(context.Background())
+func (s *APIServer) Stop() error {
+	return s.httpServer.Shutdown(context.Background())
 }

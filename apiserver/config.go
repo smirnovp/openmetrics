@@ -26,7 +26,7 @@ func (c *Config) GetFromFile() error {
 	}
 
 	viper.SetDefault("Addr", ":8080")
-	c.Addr = viper.GetString("Addr")
+	c.Addr = viper.GetString("apiserver.addr")
 
 	return nil
 }

@@ -2,4 +2,4 @@
 level="debug"
 
 [apiserver]
-addr=":8082"
+addr=""

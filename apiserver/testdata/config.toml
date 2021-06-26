@@ -1,2 +1,5 @@
 [logger]
 level="debug"
+
+[apiserver]
+addr=":8082"

@@ -5,7 +5,7 @@ import (
 )
 
 // Routes ...
-func (s *APIServer) Routes() {
+func (s *APIServer) routes() {
 	s.mux.Handle("/metrics", s.MetricsHandler())
 }
 
@@ -18,6 +18,8 @@ func (s *APIServer) MetricsHandler() http.HandlerFunc {
 			http.Error(w, "Ошибка конвертирования данных из файла", http.StatusInternalServerError)
 			return
 		}
-		w.Write([]byte(metrics))
+		if _, err := w.Write([]byte(metrics)); err != nil {
+			s.logger.Error(err)
+		}
 	}
 }
