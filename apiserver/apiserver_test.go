@@ -25,8 +25,6 @@ func (m *MockConverterError) GetMetrics() (string, error) {
 func TestListenAndServeFail(t *testing.T) {
 
 	server := New(logrus.New(), NewConfig("testdata/configBadAddr.toml"), &MockConverter{})
-	server.config.Addr = ":808154354543"
-	fmt.Println("--------------> Addr = ", server.config.Addr)
 	err := server.Run()
 	assert.NotEqual(t, nil, err, "Должна быть ошибка с занятым портом")
 }
