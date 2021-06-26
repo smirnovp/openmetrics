@@ -33,3 +33,28 @@ currencies:
   - name: eur
     value: 80
 ```
+
+## Запуск приложения
+
+```
+make run
+```
+
+или 
+
+```
+make build
+./openmetrics
+```
+
+## Тесты
+
+```
+make test
+```
+
+или
+
+```
+make test-html
+```
