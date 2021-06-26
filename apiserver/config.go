@@ -6,19 +6,21 @@ import (
 
 // Config ...
 type Config struct {
-	Addr string
+	FileName string
+	Addr     string
 }
 
 // NewConfig ...
-func NewConfig() *Config {
+func NewConfig(f string) *Config {
 	return &Config{
-		Addr: ":8080",
+		FileName: f,
+		Addr:     ":8080",
 	}
 }
 
 // GetFromFile ...
-func (c *Config) GetFromFile(f string) error {
-	viper.SetConfigFile(f)
+func (c *Config) GetFromFile() error {
+	viper.SetConfigFile(c.FileName)
 	if err := viper.ReadInConfig(); err != nil {
 		return err
 	}

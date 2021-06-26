@@ -2,6 +2,7 @@ package converter
 
 import (
 	"fmt"
+	"openmetrics/apiserver"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -11,6 +12,11 @@ type BadReader struct{}
 
 func (b BadReader) Read(p []byte) (int, error) {
 	return 0, fmt.Errorf("Ошибка от BadReader")
+}
+
+// TestInterface канареечный тест интерфейса
+func TestInterface(t *testing.T) {
+	var _ apiserver.IConverter = &FileConverter{}
 }
 
 func TestFileConverter(t *testing.T) {
@@ -30,7 +36,8 @@ func TestFileConverter(t *testing.T) {
 	assert.Equal(t, "", metrics, "Должно быть пустое значение")
 
 	var br BadReader
-	metrics, err = convertFromReader(br)
+	format := "some format"
+	metrics, err = convertFromReader(br, format)
 	assert.NotEqual(t, nil, err, "Должна быть ошибка")
 	assert.Equal(t, "", metrics, "Должно быть пустое значение")
 }

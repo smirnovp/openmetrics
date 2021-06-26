@@ -1,6 +1,7 @@
 package apiserver
 
 import (
+	"context"
 	"net/http"
 	"time"
 
@@ -14,10 +15,12 @@ type IConverter interface {
 
 // APIServer ...
 type APIServer struct {
-	config    *Config
-	logger    *logrus.Logger
-	mux       *http.ServeMux
-	converter IConverter
+	httpServer *http.Server
+	config     *Config
+	logger     *logrus.Logger
+	mux        *http.ServeMux
+	converter  IConverter
+	// Running    <-chan struct{}
 }
 
 // New ...
@@ -25,14 +28,18 @@ func New(l *logrus.Logger, c *Config, conv IConverter) *APIServer {
 	return &APIServer{
 		config:    c,
 		logger:    l,
-		mux:       http.DefaultServeMux,
 		converter: conv,
+		mux:       http.NewServeMux(),
 	}
 }
 
-// Run ...
-func (s *APIServer) Run() error {
-	server := &http.Server{
+// ConfigureAPIServer ...
+func (s *APIServer) ConfigureAPIServer() error {
+	if err := s.config.GetFromFile(); err != nil {
+		return err
+	}
+
+	s.httpServer = &http.Server{
 		Addr:         s.config.Addr,
 		Handler:      s.mux,
 		ReadTimeout:  10 * time.Second,
@@ -41,6 +48,24 @@ func (s *APIServer) Run() error {
 
 	s.Routes()
 
+	return nil
+}
+
+// Run ...
+func (s *APIServer) Run() error {
+
+	if err := s.ConfigureAPIServer(); err != nil {
+		return err
+	}
+
 	s.logger.Infof("Starting API server on %s", s.config.Addr)
-	return server.ListenAndServe()
+	if err := s.httpServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		return err
+	}
+	return nil
+}
+
+// Stop ...
+func (s *APIServer) Stop() {
+	s.httpServer.Shutdown(context.Background())
 }

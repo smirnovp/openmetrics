@@ -24,21 +24,24 @@ func NewFileConverter(f string) *FileConverter {
 
 // GetMetrics ...
 func (c *FileConverter) GetMetrics() (string, error) {
+	format := "currencies{name:%s} %s\n"
 	f, err := os.Open(path.Clean(c.FileName))
 	if err != nil {
 		return "", err
 	}
 	defer f.Close()
-	return convertFromReader(f)
+	return convertFromReader(f, format)
 }
 
-func convertFromReader(r io.Reader) (string, error) {
-	type YamlData struct {
-		Currencies []struct {
-			Name  string `yaml:"name"`
-			Value string `yaml:"value"`
-		} `yaml:"currencies"`
-	}
+// YamlData ...
+type YamlData struct {
+	Currencies []struct {
+		Name  string `yaml:"name"`
+		Value string `yaml:"value"`
+	} `yaml:"currencies"`
+}
+
+func convertFromReader(r io.Reader, format string) (string, error) {
 
 	b, err := io.ReadAll(r)
 	if err != nil {
@@ -51,7 +54,7 @@ func convertFromReader(r io.Reader) (string, error) {
 	}
 	var buf bytes.Buffer
 	for _, cur := range data.Currencies {
-		_, err := buf.WriteString(fmt.Sprintf("currencies{name:%s} %s\n", cur.Name, cur.Value))
+		_, err := buf.WriteString(fmt.Sprintf(format, cur.Name, cur.Value))
 		if err != nil {
 			return "", err
 		}

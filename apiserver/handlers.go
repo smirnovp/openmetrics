@@ -15,7 +15,8 @@ func (s *APIServer) MetricsHandler() http.HandlerFunc {
 		metrics, err := s.converter.GetMetrics()
 		if err != nil {
 			s.logger.Error("Ошибка конвертирования: ", err)
-			http.Error(w, "Ошибка конвертироания данных из файла", http.StatusInternalServerError)
+			http.Error(w, "Ошибка конвертирования данных из файла", http.StatusInternalServerError)
+			return
 		}
 		w.Write([]byte(metrics))
 	}
