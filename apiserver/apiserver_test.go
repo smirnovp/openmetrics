@@ -23,15 +23,20 @@ func (m *MockConverterError) GetMetrics() (string, error) {
 }
 
 func TestListenAndServeFail(t *testing.T) {
-
 	server := New(logrus.New(), NewConfig("testdata/configBadAddr.toml"), &MockConverter{})
+	err := server.Run()
+	assert.NotEqual(t, nil, err, "Должна быть ошибка с занятым портом")
+}
+
+func TestGetFromFileFail(t *testing.T) {
+	server := New(logrus.New(), NewConfig("testdata/badconfig.toml"), &MockConverter{})
 	err := server.Run()
 	assert.NotEqual(t, nil, err, "Должна быть ошибка с занятым портом")
 }
 
 func TestAPIServerRUN(t *testing.T) {
 
-	server := New(logrus.New(), NewConfig("../config/config.toml"), &MockConverter{})
+	server := New(logrus.New(), NewConfig("testdata/config.toml"), &MockConverter{})
 
 	serverStopped := make(chan struct{})
 	errorc := make(chan struct{})
@@ -40,36 +45,6 @@ func TestAPIServerRUN(t *testing.T) {
 		err := server.Run()
 		if err != nil {
 			t.Error("Ошибка запуска сервера: ", err)
-			errorc <- struct{}{}
-		}
-		defer close(serverStopped)
-	}()
-
-	select {
-	case <-server.Running: // ждем пока запустится горутина запускающая сервер:
-	case <-errorc: // если сервер не запустился, то выходим
-		return
-	}
-
-	err := server.Stop()
-	if err != nil {
-		t.Error(err)
-	}
-
-	<-serverStopped // ждем пока сервер остановится и Go-рутина закроется
-}
-
-func TestAPIServerRUNFail(t *testing.T) {
-
-	server := New(logrus.New(), NewConfig("../config/confi.toml"), &MockConverter{})
-
-	serverStopped := make(chan struct{})
-	errorc := make(chan struct{})
-
-	go func() {
-		err := server.Run()
-		if err != nil {
-			assert.NotEqual(t, nil, err, "Должна быть ошибка запуска сервера")
 			errorc <- struct{}{}
 		}
 		defer close(serverStopped)
