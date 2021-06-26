@@ -24,10 +24,15 @@ func NewFileConverter(f string) *FileConverter {
 
 // GetMetrics ...
 func (c *FileConverter) GetMetrics() (string, error) {
-	return convertFromFile(c.FileName)
+	f, err := os.Open(path.Clean(c.FileName))
+	if err != nil {
+		return "", err
+	}
+	defer f.Close()
+	return convertFromReader(f)
 }
 
-func convertFromFile(fileName string) (string, error) {
+func convertFromReader(r io.Reader) (string, error) {
 	type YamlData struct {
 		Currencies []struct {
 			Name  string `yaml:"name"`
@@ -35,11 +40,7 @@ func convertFromFile(fileName string) (string, error) {
 		} `yaml:"currencies"`
 	}
 
-	f, err := os.Open(path.Clean(fileName))
-	if err != nil {
-		return "", err
-	}
-	b, err := io.ReadAll(f)
+	b, err := io.ReadAll(r)
 	if err != nil {
 		return "", err
 	}

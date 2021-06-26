@@ -22,9 +22,9 @@ func main() {
 	converter := converter.NewFileConverter("currencies.yaml")
 
 	apiserver := apiserver.New(logger, apiserver.NewConfig(), converter)
+
 	err := apiserver.Run()
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }
