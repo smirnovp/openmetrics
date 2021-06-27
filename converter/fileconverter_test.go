@@ -23,7 +23,7 @@ func TestFileConverter(t *testing.T) {
 	fc := NewFileConverter("testdata/currencies.yaml")
 	metrics, err := fc.GetMetrics()
 	assert.Equal(t, nil, err, "ошибка должна быть nil")
-	assert.Equal(t, "currencies{name:usd} 70\ncurrencies{name:eur} 80\n", metrics, "должны быть одинаковы")
+	assert.Equal(t, "currencies{name:\"usd\"} 70\ncurrencies{name:\"eur\"} 80\n", metrics, "должны быть одинаковы")
 
 	fc = NewFileConverter("testdata/notexisting.yaml")
 	metrics, err = fc.GetMetrics()

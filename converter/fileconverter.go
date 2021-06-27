@@ -24,7 +24,7 @@ func NewFileConverter(f string) *FileConverter {
 
 // GetMetrics ...
 func (c *FileConverter) GetMetrics() (string, error) {
-	format := "currencies{name:%s} %s\n"
+	format := "currencies{name:\"%s\"} %s\n"
 	f, err := os.Open(path.Clean(c.FileName))
 	if err != nil {
 		return "", err
