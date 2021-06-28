@@ -23,7 +23,7 @@ func TestFileConverter(t *testing.T) {
 	fc := NewFileConverter("testdata/currencies.yaml")
 	metrics, err := fc.GetMetrics()
 	assert.Equal(t, nil, err, "ошибка должна быть nil")
-	assert.Equal(t, "currencies{name:\"usd\"} 70\ncurrencies{name:\"eur\"} 80\n", metrics, "должны быть одинаковы")
+	assert.Equal(t, "# TYPE currencies gauge\ncurrencies{name:\"usd\"} 70\ncurrencies{name:\"eur\"} 80\n", metrics, "должны быть одинаковы")
 
 	fc = NewFileConverter("testdata/notexisting.yaml")
 	metrics, err = fc.GetMetrics()
@@ -36,8 +36,9 @@ func TestFileConverter(t *testing.T) {
 	assert.Equal(t, "", metrics, "Должно быть пустое значение")
 
 	var br BadReader
+	mtype := ""
 	format := "some format"
-	metrics, err = convertFromReader(br, format)
+	metrics, err = convertFromReader(br, mtype, format)
 	assert.NotEqual(t, nil, err, "Должна быть ошибка")
 	assert.Equal(t, "", metrics, "Должно быть пустое значение")
 }
